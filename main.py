@@ -2,7 +2,7 @@ import pandas as pd
 from fpdf import FPDF
 from glob import glob
 
-# Bundle all Excel files in invoices
+# Bundle all Excel files in invoices directory
 filenames = glob('invoices/*.xlsx')
 
 # Create PDF from each Excel file
