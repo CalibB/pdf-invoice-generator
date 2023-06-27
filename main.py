@@ -1,33 +1,52 @@
 import pandas as pd
 from fpdf import FPDF
+from glob import glob
 
-# Create a DataFrame with the chosen Excel file
-df = pd.read_excel('invoices/10001-2023.1.18.xlsx')
+# Bundle all Excel files in invoices
+filenames = glob('invoices/*.xlsx')
 
-# Create instance of the FPDF class
-pdf = FPDF()
+# Create PDF from each Excel file
+for filename in filenames:
 
-# Create page and set font with a title
-pdf.add_page()
-pdf.set_font(family='Helvetica', size=15)
-# pdf.cell(w=0, txt='Invoice', border='B')
+    # Create a DataFrame with the chosen Excel file
+    df = pd.read_excel(filename)
 
-# Create table for the invoice
-with pdf.table(width=190, col_widths=(40, 40, 40, 40, 30)) as table:
-    table_headings = table.row()
-    table_headings.cell('Product ID')
-    table_headings.cell('Product Name')
-    table_headings.cell('Amount Purchased')
-    table_headings.cell('Price Per Unit')
-    table_headings.cell('Total Price')
+    # Create instance of the FPDF class
+    pdf = FPDF()
 
-    # add data from the file into the table
-    for index, data_row in df.iterrows():
-        row = table.row()
-        row.cell(str(data_row['product_id']))
-        row.cell(str(data_row['product_name']))
-        row.cell(str(data_row['amount_purchased']))
-        row.cell(str(data_row['price_per_unit']))
-        row.cell(str(data_row['total_price']))
+    # Create page and set font with a title
+    pdf.add_page()
+    pdf.set_font(family='Helvetica', size=15)
+    pdf.cell(w=0, txt='Customer Invoice', align='C')
+    pdf.ln(15)
 
-pdf.output('test.pdf')
+    # Create table for the invoice
+    with pdf.table(width=190, col_widths=(40, 50, 50, 45, 30), text_align='CENTER') as table:
+        table_headings = table.row()
+        table_headings.cell('Product ID')
+        table_headings.cell('Product Name')
+        table_headings.cell('Amount Purchased')
+        table_headings.cell('Price Per Unit')
+        table_headings.cell('Total Price')
+
+        # add data from the file into the table
+        for index, data_row in df.iterrows():
+            row = table.row()
+            row.cell(str(data_row['product_id']))
+            row.cell(str(data_row['product_name']))
+            row.cell(str(data_row['amount_purchased']))
+            row.cell(str(data_row['price_per_unit']))
+            row.cell(str(data_row['total_price']))
+
+        total_row = table.row()
+        total_row.cell('', colspan=3)
+        total_row.cell('')
+        total_row.cell('')
+        total_row.cell('Total Due:')
+        total_price = 0
+        for price in df['total_price']:
+            total_price = total_price + price
+
+        total_row.cell(str(total_price))
+
+    pdf.output(f'invoices/pdf/{filename[9:].strip(".xlsx")}.pdf')
