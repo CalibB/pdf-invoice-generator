@@ -43,10 +43,7 @@ for filename in filenames:
         total_row.cell('')
         total_row.cell('')
         total_row.cell('Total Due:')
-        total_price = 0
-        for price in df['total_price']:
-            total_price = total_price + price
-
+        total_price = df['total_price'].sum()
         total_row.cell(str(total_price))
 
     pdf.output(f'PDFs/{filename[9:].strip(".xlsx")}.pdf')
