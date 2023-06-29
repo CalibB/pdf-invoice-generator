@@ -49,4 +49,4 @@ for filename in filenames:
 
         total_row.cell(str(total_price))
 
-    pdf.output(f'invoices/pdf/{filename[9:].strip(".xlsx")}.pdf')
+    pdf.output(f'PDFs/{filename[9:].strip(".xlsx")}.pdf')
